@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TörténelemGPT – A második világháború</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1e0f06;background-image:radial-gradient(ellipse at 15% 0%,#2e1808 0%,transparent 55%),radial-gradient(ellipse at 85% 100%,#110804 0%,transparent 55%);min-height:100vh;font-family:'EB Garamond',Georgia,serif;color:#1a1410;padding:1.5rem 1rem 3rem;display:flex;flex-direction:column;align-items:center}
+h1{font-family:'Playfair Display',Georgia,serif;font-size:2rem;font-weight:700;color:#f5deb3;line-height:1.15;text-shadow:0 2px 8px rgba(0,0,0,.4)}
+.badge{display:inline-block;background:#7b1414;color:#f5deb3;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;padding:3px 12px;border-radius:2px;margin-bottom:.8rem;font-family:'EB Garamond',serif;font-weight:600}
+.subtitle{color:#b8956a;font-size:.95rem;font-style:italic;margin-top:.3rem}
+.header{text-align:center;margin-bottom:2rem;max-width:720px;width:100%}
+.card{background:linear-gradient(135deg,#faf6ef,#f4ead8,#faf6ef);border-radius:3px;border:1px solid #c8b490;box-shadow:0 2px 14px rgba(0,0,0,.15),inset 0 0 30px rgba(160,120,60,.05);padding:1.5rem 2rem;max-width:720px;width:100%;margin-bottom:1.2rem;position:relative}
+.card::before{content:'';position:absolute;top:5px;left:5px;right:5px;bottom:5px;border:.5px solid #c8b490;border-radius:1px;pointer-events:none;opacity:.4}
+.sec-title{font-family:'Playfair Display',serif;font-size:1.1rem;color:#7b1414;margin-bottom:1rem;padding-bottom:.5rem;border-bottom:1px solid #d4c4a0;display:flex;align-items:center;gap:8px}
+.api-row{display:flex;gap:.6rem;align-items:center;margin-bottom:1.2rem;padding:.8rem 1rem;background:#fff8ee;border:1px solid #e8c878;border-radius:3px}
+.api-row label{font-size:.78rem;color:#7a5a00;white-space:nowrap;font-weight:600;letter-spacing:.04em}
+.api-input{flex:1;padding:.45rem .7rem;border:1px solid #c8b490;border-radius:2px;background:#fff;color:#1a1410;font-family:'EB Garamond',serif;font-size:.88rem;letter-spacing:.05em}
+.api-input:focus{outline:2px solid #7b1414;border-color:transparent}
+.api-save{padding:.45rem .9rem;background:#7b1414;color:#f5deb3;border:none;border-radius:2px;font-family:'EB Garamond',serif;font-size:.85rem;cursor:pointer;white-space:nowrap}
+.api-save:hover{background:#5e0f0f}
+.api-status{font-size:.75rem;margin-top:.3rem}
+.api-ok{color:#2e7d32}
+.api-missing{color:#c0392b}
+.mode-tabs{display:flex;border:1px solid #c8b490;border-radius:3px;overflow:hidden;margin-bottom:1.2rem}
+.mode-tab{flex:1;padding:.6rem .3rem;border:none;border-right:1px solid #c8b490;background:#ece4d0;color:#6a5e50;font-family:'EB Garamond',serif;font-size:.83rem;cursor:pointer;transition:all .15s}
+.mode-tab:last-child{border-right:none}
+.mode-tab:hover{background:#e0d4b8}
+.mode-tab.active{background:#7b1414;color:#f5deb3;font-weight:600}
+.cfg-row{display:flex;gap:.8rem;margin-bottom:1rem;flex-wrap:wrap}
+.cfg-grp{flex:1;min-width:140px}
+.cfg-grp label{display:block;font-size:.72rem;color:#7a6e65;margin-bottom:.3rem;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+.cfg-grp select{width:100%;padding:.45rem .7rem;border:1px solid #c8b490;border-radius:2px;background:#fff;color:#1a1410;font-family:'EB Garamond',serif;font-size:.88rem;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%237a6e65'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:24px}
+.gen-btn{width:100%;padding:.8rem;background:#7b1414;color:#f5deb3;border:none;border-radius:2px;font-family:'Playfair Display',serif;font-size:1rem;cursor:pointer;transition:all .2s;letter-spacing:.03em}
+.gen-btn:hover:not(:disabled){background:#5e0f0f;transform:translateY(-1px);box-shadow:0 4px 12px rgba(123,20,20,.35)}
+.gen-btn:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(245,222,179,.3);border-top-color:#f5deb3;border-radius:50%;animation:spin .8s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.q-block{margin-bottom:1.4rem;padding-bottom:1.4rem;border-bottom:1px solid #d8ccb0}
+.q-block:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.q-num{font-size:.7rem;color:#7b1414;text-transform:uppercase;letter-spacing:.1em;font-weight:700;margin-bottom:.35rem}
+.q-text{font-size:.97rem;line-height:1.65;color:#1a1410;margin-bottom:.7rem}
+.opts{list-style:none;display:flex;flex-direction:column;gap:.35rem}
+.opt{display:flex;align-items:flex-start;gap:8px;padding:.5rem .8rem;border:1px solid #c8b490;border-radius:2px;background:#fff;cursor:pointer;transition:all .12s;font-size:.9rem;line-height:1.5}
+.opt:hover{background:#f0e9d8;border-color:#a89060}
+.opt.correct{background:#e8f5e9;border-color:#2e7d32;color:#1a3d1e}
+.opt.wrong{background:#fdecea;border-color:#c0392b;color:#4a1010}
+.opt-ltr{font-weight:700;color:#7b1414;min-width:16px;flex-shrink:0;font-size:.82rem;margin-top:1px}
+.opt.correct .opt-ltr{color:#2e7d32}
+.opt.wrong .opt-ltr{color:#c0392b}
+.tf-row{display:flex;gap:.6rem}
+.tf-btn{flex:1;padding:.5rem;border:1px solid #c8b490;border-radius:2px;background:#fff;font-family:'EB Garamond',serif;font-size:.9rem;cursor:pointer;transition:all .12s}
+.tf-btn:hover:not(:disabled){background:#f0e9d8}
+.tf-btn.correct{background:#e8f5e9;border-color:#2e7d32;color:#1a3d1e;font-weight:600}
+.tf-btn.wrong{background:#fdecea;border-color:#c0392b;color:#4a1010}
+.fill-in{width:100%;padding:.45rem .7rem;border:1px solid #c8b490;border-radius:2px;background:#fff;font-family:'EB Garamond',serif;font-size:.92rem;margin-bottom:.5rem}
+.fill-in:focus{outline:2px solid #7b1414;border-color:transparent}
+.check-btn{padding:.4rem 1rem;background:#1a3a5c;color:#d4e8f5;border:none;border-radius:2px;font-family:'EB Garamond',serif;font-size:.83rem;cursor:pointer;margin-right:.4rem}
+.check-btn:hover{background:#0d2640}
+.show-btn{padding:.4rem .9rem;background:transparent;border:1px solid #c8b490;border-radius:2px;font-family:'EB Garamond',serif;font-size:.83rem;color:#6a5e50;cursor:pointer}
+.show-btn:hover{background:#ece4d0}
+.res-msg{font-size:.83rem;margin-top:.45rem;padding:.35rem .65rem;border-radius:2px}
+.res-ok{background:#e8f5e9;color:#1a3d1e}
+.res-bad{background:#fdecea;color:#4a1010}
+.essay-ta{width:100%;min-height:100px;padding:.65rem;border:1px solid #c8b490;border-radius:2px;background:#fff;font-family:'EB Garamond',serif;font-size:.9rem;line-height:1.6;color:#1a1410;resize:vertical;margin-bottom:.6rem}
+.essay-ta:focus{outline:2px solid #7b1414;border-color:transparent}
+.ans-box{background:#f0ece0;border-left:3px solid #b8860b;padding:.8rem .9rem;border-radius:0 2px 2px 0;font-size:.88rem;line-height:1.7;color:#3d3228;margin-top:.5rem;display:none}
+.ans-box.show{display:block}
+.ans-lbl{font-size:.68rem;color:#b8860b;text-transform:uppercase;letter-spacing:.12em;font-weight:700;margin-bottom:.35rem}
+.score-bar{display:none;align-items:center;justify-content:space-between;padding:.65rem .9rem;background:#f5deb3;border-radius:2px;border:1px solid #c8a840;margin-bottom:1.2rem;font-size:.85rem;color:#5a3d00}
+.score-bar.show{display:flex}
+.score-n{font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;color:#b8860b}
+.sol-toggle{margin-top:1.5rem;padding-top:1.2rem;border-top:1px solid #d4c4a0}
+.sol-btn{width:100%;padding:.7rem;background:#1a3a5c;color:#d4e8f5;border:none;border-radius:2px;font-family:'EB Garamond',serif;font-size:.9rem;cursor:pointer;letter-spacing:.02em}
+.sol-btn:hover{background:#0d2640}
+.sol-panel{display:none;margin-top:1rem;background:#f0ece0;border-radius:2px;padding:1.2rem;border:1px solid #c8b490}
+.sol-panel.show{display:block}
+.sol-panel h3{font-family:'Playfair Display',serif;color:#1a3a5c;margin-bottom:.9rem;font-size:1rem}
+.sol-item{margin-bottom:.8rem;padding-bottom:.8rem;border-bottom:1px solid #d0c8b0}
+.sol-item:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sol-q{font-size:.78rem;color:#7a6e65;margin-bottom:.25rem}
+.sol-a{font-size:.9rem;color:#1a1410;line-height:1.6}
+.sol-a strong{color:#2e7d32}
+.loading{text-align:center;padding:1.8rem;color:#7a6e65;font-style:italic;font-size:.92rem}
+.err-box{background:#fdecea;border:1px solid #e88;border-radius:2px;padding:.9rem;color:#4a1010;font-size:.88rem;margin-top:.8rem}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="badge">Tanulást Segítő GPT</div>
+  <h1>Történelem Dolgozat</h1>
+  <div class="subtitle">A második világháború · 11. évfolyam · Száray Miklós tankönyve alapján</div>
+</div>
+
+<!-- API KULCS BEÁLLÍTÁS -->
+<div class="card">
+  <div class="sec-title">🔑 API Kulcs beállítása</div>
+  <div class="api-row">
+    <label>ANTHROPIC API KULCS</label>
+    <input type="password" class="api-input" id="apikey" placeholder="sk-ant-api03-..." oninput="checkKey()">
+    <button class="api-save" onclick="saveKey()">Mentés</button>
+  </div>
+  <div class="api-status" id="keystatus"></div>
+  <div style="font-size:.78rem;color:#7a6e65;margin-top:.5rem;line-height:1.6">
+    💡 Az API kulcsot a <strong>console.anthropic.com</strong> oldalon tudod létrehozni.<br>
+    A kulcs csak a böngésződben tárolódik (localStorage), nem kerül sehova máshova.
+  </div>
+</div>
+
+<!-- BEÁLLÍTÁSOK -->
+<div class="card">
+  <div class="sec-title">⚙ Dolgozat beállítások</div>
+  <div style="margin-bottom:1.1rem">
+    <label style="font-size:.72rem;color:#7a6e65;display:block;margin-bottom:.3rem;text-transform:uppercase;letter-spacing:.06em;font-weight:600">Kérdéstípus</label>
+    <div class="mode-tabs">
+      <button class="mode-tab active" onclick="setMode('mixed',this)">Vegyes</button>
+      <button class="mode-tab" onclick="setMode('multiple',this)">Feleletválasztós</button>
+      <button class="mode-tab" onclick="setMode('truefalse',this)">Igaz/Hamis</button>
+      <button class="mode-tab" onclick="setMode('fill',this)">Hiányos mondat</button>
+      <button class="mode-tab" onclick="setMode('essay',this)">Esszé</button>
+    </div>
+  </div>
+  <div class="cfg-row">
+    <div class="cfg-grp">
+      <label>Témakör</label>
+      <select id="topic">
+        <option value="general">Általános – az egész fejezet</option>
+        <option value="outbreak">A háború kitörése, Molotov–Ribbentrop</option>
+        <option value="blitz">Villámháborúk – Lengyelország, Nyugat</option>
+        <option value="turning">Fordulópontok – Sztálingrád, El-Alamein</option>
+        <option value="end">Szövetségesek győzelme, Jalta, atombömbák</option>
+        <option value="hungary">Magyarország a második világháborúban</option>
+        <option value="holocaust">Holokauszt és Nürnbergi perek</option>
+      </select>
+    </div>
+    <div class="cfg-grp">
+      <label>Nehézség</label>
+      <select id="diff">
+        <option value="easy">Könnyű – alapfogalmak</option>
+        <option value="medium" selected>Közepes – összefüggések</option>
+        <option value="hard">Nehéz – elemzés, értékelés</option>
+      </select>
+    </div>
+    <div class="cfg-grp">
+      <label>Kérdések száma</label>
+      <select id="qcount">
+        <option value="5">5 kérdés</option>
+        <option value="8" selected>8 kérdés</option>
+        <option value="10">10 kérdés</option>
+      </select>
+    </div>
+  </div>
+  <button class="gen-btn" id="gbtn" onclick="generate()">Dolgozat generálása</button>
+</div>
+
+<!-- KIMENET -->
+<div class="card" id="out" style="display:none">
+  <div id="qcontent"></div>
+  <div class="sol-toggle" id="soltog" style="display:none">
+    <button class="sol-btn" onclick="toggleSol()">📋 Megoldókulcs megtekintése</button>
+    <div class="sol-panel" id="solpanel"></div>
+  </div>
+</div>
+
+<script>
+// ── ÁLLAPOT ──────────────────────────────────────────
+let mode = 'mixed';
+let quiz = null;
+let mcScore = 0, mcTotal = 0;
+
+// ── API KULCS KEZELÉS ─────────────────────────────────
+function loadKey() {
+  try { return localStorage.getItem('anthro_key') || ''; } catch(e) { return ''; }
+}
+function saveKey() {
+  const k = document.getElementById('apikey').value.trim();
+  try { localStorage.setItem('anthro_key', k); } catch(e) {}
+  checkKey();
+}
+function checkKey() {
+  const k = document.getElementById('apikey').value.trim() || loadKey();
+  const st = document.getElementById('keystatus');
+  if (k.startsWith('sk-ant-')) {
+    st.textContent = '✓ API kulcs beállítva – készen áll a generálásra';
+    st.className = 'api-status api-ok';
+  } else if (k.length > 0) {
+    st.textContent = '⚠ Ez nem tűnik érvényes Anthropic API kulcsnak (sk-ant-... formátum kell)';
+    st.className = 'api-status api-missing';
+  } else {
+    st.textContent = '⚠ API kulcs hiányzik – generálás nem lehetséges';
+    st.className = 'api-status api-missing';
+  }
+}
+// Betöltéskor töltse ki a mezőt ha van mentve
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = loadKey();
+  if (saved) document.getElementById('apikey').value = saved;
+  checkKey();
+});
+
+// ── MÓD VÁLTÁS ───────────────────────────────────────
+function setMode(m, btn) {
+  mode = m;
+  document.querySelectorAll('.mode-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── TANKÖNYVI TARTALOM ───────────────────────────────
+const CTX = `Száray Miklós: Történelem 11. – A második világháború fejezet:
+- 1939. aug.23. Molotov–Ribbentrop-paktum: megnemtámadási szerz., titkos záradék (Lengyelország, Baltikum, Besszarábia, Finnország felosztása)
+- 1939. szept.1. Németország megtámadja Lengyelországot → Nagy-Britannia és Franciaország hadat üzen → II. vh. kitörése (1939–1945)
+- 1939. szept.17. szovjet támadás Lengyelország ellen. Katyń-mészárlás (~22000 lengyel tiszt, 1940)
+- Furcsa háború: a nyugati fronton nincs harci cselekmény
+- Szovjet–finn háború 1939 nov.–1940 tavasz: szovjet agresszió, szovjet Vörös Hadsereg gyengeségei napvilágra kerülnek
+- 1940 ápr.: Dánia, Norvégia elfoglalása
+- 1940 máj.–jún.: Belgiumon át Maginot-vonal megkerülése, Franciaország összeomlása; Dunkerque-kimentés; Vichy-Franciaország (Pétain) vs. Szabad Franciaország (de Gaulle, London)
+- Angliai csata 1940 júl.–szept.: Luftwaffe vs. RAF, Hitler feladja Nagy-Britannia megszállását
+- 1941 tavasz: Rommel Afrika-hadtest; Jugoszlávia, Görögország lerohanása
+- 1941. jún.22. Barbarossa-terv: 3 irány (Leningrád, Moszkva, Kijev), villámháború kudarca, Moszkva előtt megállítják a németeket (nov.–dec.)
+- 1941. aug. Atlanti Charta: Roosevelt + Churchill (demokrácia, nemzeti önrendelkezés)
+- 1941. dec.7. Pearl Harbor: japán támadás → USA hadba lép
+- 1942–43: Sztálingrád – Paulus 6. hadserege bekerítve, 90000 hadifogoly, fordulópont. Magyar 2. hadsereg a Don-kanyarban.
+- 1942. nov. El-Alamein: Montgomery megállítja Rommelt
+- 1943 nyár Kurszk: legnagyobb páncéloscsata, szovjet győzelem
+- 1943 júl.: szicíliai partraszállás, Mussolini bukása, Olaszország kilép
+- 1943 nov.–dec. Teheráni konferencia: 2. front Normandiában, szovjet hadjárat Japán ellen
+- 1944 aug.: Varsói felkelés – Honi Hadsereg, Sztálin nem segít, németek leverik
+- 1944. jún.6. Normandiai partraszállás: 2. front megnyitása
+- 1945 febr. Jalta: Németország megszállási övezetei, Lengyelország, háborús bűnösök
+- 1945 máj.8.: Németország kapitulál, Hitler öngyilkos ápr.30.
+- 1945 júl. Potsdam: Truman, Attlee, Sztálin – keleti határok, nürnbergi perek
+- 1945. aug.6. Hirosima, aug.9. Nagaszaki: ~200–250000 áldozat
+- 1945. szept.2.: Japán megadja magát. ~52 millió halott összesen.
+- ENSZ megalapítása 1945. jún., San Francisco
+- Magyarország: Teleki Pál politikája, Kárpátalja 1939, Észak-Erdély 1940, hadba lép 1941, Don-kanyar 1943, német megszállás 1944. márc.19., holokauszt (500000 magyar zsidó deportálása), nyilasok – Szálasi
+- Holokauszt: ~6 millió zsidó kiirtása. Nürnbergi perek 1945–46.`;
+
+const TOPICS = {
+  general: 'az egész második világháborús fejezet',
+  outbreak: 'a háború kitörése és a Molotov–Ribbentrop-paktum',
+  blitz: 'a villámháborúk (Lengyelország, Nyugat-Európa, angliai csata)',
+  turning: 'a fordulópontok (Sztálingrád, El-Alamein, Kurszk)',
+  end: 'a szövetségesek győzelme (Jalta, Potsdam, atombombák, japán megadás)',
+  hungary: 'Magyarország a második világháborúban',
+  holocaust: 'a holokauszt és a Nürnbergi perek'
+};
+const DIFFS = {
+  easy: 'Könnyű: alapfogalmak, évszámok, személyek – egyszerű kérdések.',
+  medium: 'Közepes: ok-okozati összefüggések, folyamatok, döntések megértése.',
+  hard: 'Nehéz: kritikai elemzés, összehasonlítás, következmények értékelése.'
+};
+const MODES = {
+  multiple: 'CSAK feleletválasztós kérdések, minden kérdéshez 4 opció (A,B,C,D).',
+  truefalse: 'CSAK igaz/hamis állítások.',
+  fill: 'CSAK hiányos mondatok, ahol ___ jelöli a hiányzó szót.',
+  essay: 'CSAK esszékérdések mintaválasszal (150–250 szó).',
+  mixed: 'Vegyes: feleletválasztós, igaz/hamis, hiányos mondat és esszé vegyesen.'
+};
+
+// ── GENERÁLÁS ────────────────────────────────────────
+async function generate() {
+  const apiKey = document.getElementById('apikey').value.trim() || loadKey();
+  if (!apiKey.startsWith('sk-ant-')) {
+    alert('Kérlek add meg az Anthropic API kulcsot (sk-ant-... formátum)!');
+    return;
+  }
+
+  const btn = document.getElementById('gbtn');
+  const out = document.getElementById('out');
+  const qc  = document.getElementById('qcontent');
+
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Generálás…';
+  out.style.display = 'block';
+  qc.innerHTML = '<div class="loading">⌛ A GPT dolgozatot készít… Ez néhány másodpercet vesz igénybe.</div>';
+  document.getElementById('soltog').style.display = 'none';
+  mcScore = 0; mcTotal = 0;
+
+  const topic = document.getElementById('topic').value;
+  const diff  = document.getElementById('diff').value;
+  const cnt   = document.getElementById('qcount').value;
+
+  const prompt = `${CTX}
+
+FELADAT: Készíts ${cnt} db történelem dolgozatkérdést KIZÁRÓLAG erről a témakörről: ${TOPICS[topic]}.
+${DIFFS[diff]}
+${MODES[mode]}
+
+Válaszolj CSAK érvényes JSON-ban, semmi más szöveggel:
+{"title":"cím","questions":[
+  {"type":"multiple","question":"...","options":["A) ...","B) ...","C) ...","D) ..."],"correct":"A","explanation":"1-2 mondat"},
+  {"type":"truefalse","question":"...","correct":true,"explanation":"1-2 mondat"},
+  {"type":"fill","question":"... ___ ...","answer":"helyes szó","explanation":"1-2 mondat"},
+  {"type":"essay","question":"...","modelAnswer":"mintaválasz 150-250 szó"}
+]}
+Magyar nyelven. Szakmailag pontos, 11. évfolyamos szintű kérdések.`;
+
+  try {
+    const r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 4000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error?.message || `HTTP ${r.status}`);
+
+    const raw = d.content[0].text.trim();
+    const m = raw.match(/\{[\s\S]*\}/);
+    if (!m) throw new Error('Érvénytelen JSON válasz');
+
+    quiz = JSON.parse(m[0]);
+    renderQuiz(quiz);
+
+  } catch(e) {
+    qc.innerHTML = `<div class="err-box">⚠ Hiba: ${e.message}<br><br>Lehetséges ok: hibás API kulcs, vagy lejárt az egyenleg a console.anthropic.com-on.</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Új dolgozat generálása';
+  }
+}
+
+// ── MEGJELENÍTÉS ─────────────────────────────────────
+function tlbl(t) {
+  return { multiple:'Feleletválasztós', truefalse:'Igaz / Hamis', fill:'Hiányos mondat', essay:'Esszékérdés' }[t] || t;
+}
+
+function renderQuiz(data) {
+  const qc = document.getElementById('qcontent');
+  let h = `<div class="sec-title">📝 ${data.title || 'Történelem Dolgozat'}</div>`;
+  let mc = 0;
+
+  data.questions.forEach((q, i) => {
+    h += `<div class="q-block" id="qb${i}">`;
+    h += `<div class="q-num">${i+1}. kérdés · ${tlbl(q.type)}</div>`;
+    h += `<div class="q-text">${q.question}</div>`;
+
+    if (q.type === 'multiple') {
+      mc++;
+      h += `<ul class="opts">`;
+      q.options.forEach((o, j) => {
+        const l = ['A','B','C','D'][j];
+        h += `<li class="opt" id="o${i}_${j}" onclick="pickOpt(${i},'${l}','${q.correct}')">
+                <span class="opt-ltr">${l})</span>
+                <span>${o.replace(/^[A-D]\)\s*/, '')}</span>
+              </li>`;
+      });
+      h += `</ul>`;
+      h += `<div class="ans-box" id="exp${i}"><div class="ans-lbl">✓ Magyarázat</div>${q.explanation||''}</div>`;
+    }
+    else if (q.type === 'truefalse') {
+      h += `<div class="tf-row">
+              <button class="tf-btn" id="tf${i}t" onclick="pickTF(${i},true,${q.correct})">✓ Igaz</button>
+              <button class="tf-btn" id="tf${i}f" onclick="pickTF(${i},false,${q.correct})">✗ Hamis</button>
+            </div>`;
+      h += `<div class="ans-box" id="exp${i}"><div class="ans-lbl">✓ Magyarázat</div>${q.explanation||''}</div>`;
+    }
+    else if (q.type === 'fill') {
+      const esc = q.answer.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+      h += `<input type="text" class="fill-in" id="fi${i}" placeholder="Írd be a hiányzó szót…">
+            <div style="display:flex;gap:.4rem;flex-wrap:wrap">
+              <button class="check-btn" onclick="chkFill(${i},'${esc}')">Ellenőrzés</button>
+              <button class="show-btn" onclick="showA(${i})">Mutasd a választ</button>
+            </div>
+            <div class="res-msg" id="res${i}" style="display:none"></div>`;
+      h += `<div class="ans-box" id="exp${i}"><div class="ans-lbl">✓ Helyes válasz</div><strong>${q.answer}</strong>${q.explanation ? ' — '+q.explanation : ''}</div>`;
+    }
+    else if (q.type === 'essay') {
+      h += `<textarea class="essay-ta" id="es${i}" placeholder="Írd ide a választ… (kb. 150–250 szó)"></textarea>
+            <button class="show-btn" onclick="showA(${i})">Mintaválasz megjelenítése</button>`;
+      h += `<div class="ans-box" id="exp${i}"><div class="ans-lbl">📖 Mintaválasz</div>${q.modelAnswer||''}</div>`;
+    }
+    h += `</div>`;
+  });
+
+  if (mc > 0) {
+    h += `<div class="score-bar" id="sbar">
+            <span>Eredmény:</span>
+            <span class="score-n" id="snum">0 / ${mc}</span>
+            <span style="font-size:.78rem;color:#7a5a00">feleletválasztós kérdés</span>
+          </div>`;
+  }
+
+  qc.innerHTML = h;
+  document.getElementById('soltog').style.display = 'block';
+  renderSol(data);
+}
+
+// ── INTERAKCIÓ ───────────────────────────────────────
+function pickOpt(qi, sel, cor) {
+  const b = document.getElementById(`qb${qi}`);
+  if (b.dataset.done) return;
+  b.dataset.done = '1';
+  ['A','B','C','D'].forEach((l, j) => {
+    const el = document.getElementById(`o${qi}_${j}`);
+    if (l === cor) el.classList.add('correct');
+    else if (l === sel && sel !== cor) el.classList.add('wrong');
+    el.style.pointerEvents = 'none';
+  });
+  showA(qi);
+  if (sel === cor) mcScore++;
+  mcTotal++;
+  updScore();
+}
+
+function pickTF(qi, sel, cor) {
+  const b = document.getElementById(`qb${qi}`);
+  if (b.dataset.done) return;
+  b.dataset.done = '1';
+  const tb = document.getElementById(`tf${qi}t`);
+  const fb = document.getElementById(`tf${qi}f`);
+  if (cor === true)  tb.classList.add('correct'); else fb.classList.add('correct');
+  if (sel !== cor) { if (sel) tb.classList.add('wrong'); else fb.classList.add('wrong'); }
+  tb.disabled = true; fb.disabled = true;
+  showA(qi);
+}
+
+function chkFill(qi, cor) {
+  const val = document.getElementById(`fi${qi}`).value.trim().toLowerCase();
+  const cl  = cor.toLowerCase();
+  const ok  = val === cl || (cl.includes(val) && val.length > 2);
+  const rm  = document.getElementById(`res${qi}`);
+  rm.style.display = 'block';
+  rm.className = `res-msg ${ok ? 'res-ok' : 'res-bad'}`;
+  rm.textContent = ok ? '✓ Helyes válasz!' : '✗ Nem pontos. Helyes: ' + cor;
+  if (!ok) showA(qi);
+}
+
+function showA(i) {
+  const e = document.getElementById(`exp${i}`);
+  if (e) e.classList.add('show');
+}
+
+function updScore() {
+  const sb = document.getElementById('sbar');
+  if (sb) {
+    sb.classList.add('show');
+    document.getElementById('snum').textContent = `${mcScore} / ${mcTotal}`;
+  }
+}
+
+// ── MEGOLDÓKULCS ─────────────────────────────────────
+function renderSol(data) {
+  const p = document.getElementById('solpanel');
+  let h = `<h3>📋 Megoldókulcs</h3>`;
+  data.questions.forEach((q, i) => {
+    h += `<div class="sol-item">
+            <div class="sol-q">${i+1}. ${tlbl(q.type)}: ${q.question.substring(0,75)}${q.question.length>75?'…':''}</div>
+            <div class="sol-a">`;
+    if (q.type === 'multiple')  h += `<strong>Helyes: ${q.correct})</strong> — ${q.explanation||''}`;
+    if (q.type === 'truefalse') h += `<strong>${q.correct ? 'IGAZ' : 'HAMIS'}</strong> — ${q.explanation||''}`;
+    if (q.type === 'fill')      h += `<strong>${q.answer}</strong>${q.explanation ? ' — '+q.explanation : ''}`;
+    if (q.type === 'essay')     h += q.modelAnswer || '';
+    h += `</div></div>`;
+  });
+  p.innerHTML = h;
+}
+
+function toggleSol() {
+  const p = document.getElementById('solpanel');
+  const b = document.querySelector('.sol-btn');
+  p.classList.toggle('show');
+  b.textContent = p.classList.contains('show') ? '▲ Megoldókulcs elrejtése' : '📋 Megoldókulcs megtekintése';
+}
+</script>
+</body>
+</html>
